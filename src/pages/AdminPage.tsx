@@ -148,9 +148,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({
         <button
           type="button"
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-amber-600/25 transition-all flex items-center gap-2 self-start sm:self-auto"
+          className="px-5 py-2.5 rounded-2xl glossy-button-gold text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition-all flex items-center gap-2 self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 text-slate-950" />
           <span>Publish Official Notice</span>
         </button>
       </div>

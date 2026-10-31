@@ -354,9 +354,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           <button
             type="submit"
-            className="px-7 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2"
+            className="px-8 py-3.5 rounded-2xl glossy-button-gold text-slate-950 font-black text-xs shadow-xl transition-all flex items-center gap-2"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-slate-950" />
             <span>Save Student Preferences</span>
           </button>
         </div>

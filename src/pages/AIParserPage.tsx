@@ -270,9 +270,9 @@ export const AIParserPage: React.FC<AIParserPageProps> = ({
                 type="button"
                 onClick={handleStartExtraction}
                 disabled={isProcessing || !inputText.trim()}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3.5 rounded-2xl glossy-button-gold text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-slate-950" />
                 <span>{isProcessing ? 'Processing with AI...' : 'Extract Notice with Gemini AI'}</span>
               </button>
             </div>
@@ -524,7 +524,7 @@ export const AIParserPage: React.FC<AIParserPageProps> = ({
 
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2"
+                  className="px-7 py-3 rounded-2xl glossy-button-violet text-white font-black text-xs shadow-lg shadow-violet-600/30 transition-all flex items-center gap-2"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Confirm & Publish to Campus Feed</span>

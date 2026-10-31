@@ -97,18 +97,18 @@ END:VCALENDAR`;
     : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xl animate-in fade-in duration-200">
       <div 
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl glass-panel border border-slate-700/80 shadow-2xl bg-[#0F172A] p-6 text-slate-100"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl glossy-panel border border-white/10 shadow-2xl bg-[#090D18] p-7 text-slate-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header & Close button */}
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
               {announcement.category}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">
               Priority: {announcement.priority}
             </span>
             {announcement.verificationStatus === 'Verified' ? (
@@ -322,7 +322,7 @@ END:VCALENDAR`;
             )}
 
             {announcement.registered ? (
-              <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 font-semibold text-sm border border-emerald-500/30">
+              <div className="flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-emerald-500/20 text-emerald-300 font-bold text-sm border border-emerald-500/30">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>You are Registered!</span>
               </div>
@@ -331,7 +331,7 @@ END:VCALENDAR`;
                 type="button"
                 onClick={handleRegisterClick}
                 disabled={isRegistering}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all flex items-center gap-2"
+                className="px-6 py-2.5 rounded-2xl glossy-button-gold text-slate-950 font-black text-sm shadow-xl flex items-center gap-2"
               >
                 <span>{isRegistering ? 'Registering...' : 'Quick RSVP / Register'}</span>
                 <Users className="w-4 h-4" />

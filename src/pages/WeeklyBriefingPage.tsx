@@ -79,7 +79,7 @@ export const WeeklyBriefingPage: React.FC<WeeklyBriefingPageProps> = ({
             type="button"
             onClick={generateBriefing}
             disabled={isGenerating}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:opacity-95 text-white text-xs font-semibold shadow-md shadow-indigo-600/25 transition-all flex items-center gap-1.5 disabled:opacity-50"
+            className="px-5 py-2.5 rounded-xl glossy-button-gold text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
             <span>{isGenerating ? 'Synthesizing...' : 'Regenerate Briefing'}</span>
@@ -90,10 +90,10 @@ export const WeeklyBriefingPage: React.FC<WeeklyBriefingPageProps> = ({
       {briefing && (
         <div className="space-y-6">
           {/* Executive Overview Banner */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-900 border border-indigo-500/30 shadow-2xl space-y-3">
-            <div className="flex items-center justify-between text-xs text-indigo-300">
-              <span className="flex items-center gap-2 font-bold">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 sm:p-8 rounded-3xl glossy-panel border border-amber-500/30 shadow-2xl space-y-3 relative overflow-hidden">
+            <div className="flex items-center justify-between text-xs text-amber-300">
+              <span className="flex items-center gap-2 font-black tracking-wider uppercase">
+                <Sparkles className="w-4 h-4 text-amber-400" />
                 EXECUTIVE INTELLIGENCE SYNTHESIS
               </span>
               <span className="font-mono text-slate-400">{briefing.generatedAt}</span>

@@ -147,7 +147,7 @@ export const CampusFeedPage: React.FC<CampusFeedPageProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search events by title, organizer, keywords (e.g. Google, hackathon, placement, scholarship)..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-slate-100 text-xs focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
           />
           {searchQuery && (
             <button
@@ -162,32 +162,32 @@ export const CampusFeedPage: React.FC<CampusFeedPageProps> = ({
 
         {/* Priority & Sorting Selectors */}
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950 border border-white/10 text-xs">
             <span className="text-slate-400 pl-2">Priority:</span>
             <select
               value={selectedPriority}
               onChange={(e) => setSelectedPriority(e.target.value)}
-              className="bg-transparent text-slate-200 text-xs focus:outline-none pr-2 cursor-pointer font-medium"
+              className="bg-transparent text-amber-300 text-xs focus:outline-none pr-2 cursor-pointer font-bold"
             >
-              <option value="All" className="bg-slate-900">All</option>
-              <option value="Urgent" className="bg-slate-900">Urgent Only</option>
-              <option value="Important" className="bg-slate-900">Important</option>
-              <option value="Upcoming" className="bg-slate-900">Upcoming</option>
-              <option value="Expired" className="bg-slate-900">Expired</option>
+              <option value="All" className="bg-[#0B0E17]">All</option>
+              <option value="Urgent" className="bg-[#0B0E17]">Urgent Only</option>
+              <option value="Important" className="bg-[#0B0E17]">Important</option>
+              <option value="Upcoming" className="bg-[#0B0E17]">Upcoming</option>
+              <option value="Expired" className="bg-[#0B0E17]">Expired</option>
             </select>
           </div>
 
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950 border border-white/10 text-xs">
             <span className="text-slate-400 pl-2">Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent text-slate-200 text-xs focus:outline-none pr-2 cursor-pointer font-medium"
             >
-              <option value="date" className="bg-slate-900">Event Date (Earliest)</option>
-              <option value="priority" className="bg-slate-900">Priority (Urgent First)</option>
-              <option value="recent" className="bg-slate-900">Recently Added</option>
-              <option value="popular" className="bg-slate-900">Most Interested</option>
+              <option value="date" className="bg-[#0B0E17]">Event Date (Earliest)</option>
+              <option value="priority" className="bg-[#0B0E17]">Priority (Urgent First)</option>
+              <option value="recent" className="bg-[#0B0E17]">Recently Added</option>
+              <option value="popular" className="bg-[#0B0E17]">Most Interested</option>
             </select>
           </div>
 
@@ -195,7 +195,7 @@ export const CampusFeedPage: React.FC<CampusFeedPageProps> = ({
             <button
               type="button"
               onClick={handleResetFilters}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition-colors flex items-center gap-1"
+              className="p-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-amber-400 text-xs transition-colors flex items-center gap-1 border border-white/10"
               title="Reset all filters"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -210,14 +210,14 @@ export const CampusFeedPage: React.FC<CampusFeedPageProps> = ({
         <button
           type="button"
           onClick={() => setSelectedCategory('All')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
             selectedCategory === 'All'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-              : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20'
+              : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/5'
           }`}
         >
           <span>All Categories</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800/80 text-slate-300">
+          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-900 text-slate-300">
             {categoryCounts.All}
           </span>
         </button>
@@ -227,15 +227,15 @@ export const CampusFeedPage: React.FC<CampusFeedPageProps> = ({
             key={cat}
             type="button"
             onClick={() => setSelectedCategory(cat)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
               selectedCategory === cat
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
+                : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/5'
             }`}
           >
             <span>{cat}</span>
             {categoryCounts[cat] !== undefined && categoryCounts[cat] > 0 && (
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-900 text-slate-300">
                 {categoryCounts[cat]}
               </span>
             )}
