@@ -15,6 +15,7 @@ import { AdminPage } from './pages/AdminPage';
 import { EventModal } from './components/shared/EventModal';
 import { ShareModal } from './components/shared/ShareModal';
 import { ReportModal } from './components/shared/ReportModal';
+import { AuthModal } from './components/auth/AuthModal';
 
 export const App: React.FC = () => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -27,6 +28,7 @@ export const App: React.FC = () => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
   const [shareTarget, setShareTarget] = useState<Announcement | null>(null);
   const [reportTarget, setReportTarget] = useState<Announcement | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
 
   // Load initial state
   useEffect(() => {
@@ -132,6 +134,34 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleLoginAsStudent = () => {
+    const defaultStudent = AnnouncementService.getStudentProfile();
+    defaultStudent.role = 'student';
+    handleUpdateProfile(defaultStudent);
+    setActiveTab('dashboard');
+  };
+
+  const handleLoginAsAdmin = () => {
+    const adminProfile: StudentProfile = {
+      ...student,
+      name: 'Dr. Sunita Rao (Dean)',
+      role: 'admin',
+    };
+    handleUpdateProfile(adminProfile);
+    setActiveTab('admin');
+  };
+
+  const handleCustomAuth = (name: string, email: string, role: 'student' | 'admin') => {
+    const updated: StudentProfile = {
+      ...student,
+      name,
+      email,
+      role,
+    };
+    handleUpdateProfile(updated);
+    setActiveTab(role === 'admin' ? 'admin' : 'dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-[#080C15] text-slate-100 flex flex-col">
       {/* Top Navigation Bar */}
@@ -141,6 +171,7 @@ export const App: React.FC = () => {
         student={student}
         onUpdateRole={handleUpdateRole}
         onOpenAIParser={() => setActiveTab('parser')}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
         urgentCount={urgentCount}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
@@ -264,6 +295,14 @@ export const App: React.FC = () => {
         announcement={reportTarget}
         onClose={() => setReportTarget(null)}
         onSubmitReport={handleSubmitReport}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginAsStudent={handleLoginAsStudent}
+        onLoginAsAdmin={handleLoginAsAdmin}
+        onCustomAuth={handleCustomAuth}
       />
     </div>
   );

@@ -20,6 +20,7 @@ interface NavbarProps {
   student: StudentProfile;
   onUpdateRole: (role: 'student' | 'admin') => void;
   onOpenAIParser: () => void;
+  onOpenAuth: () => void;
   urgentCount: number;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
@@ -31,6 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   student,
   onUpdateRole,
   onOpenAIParser,
+  onOpenAuth,
   urgentCount,
   mobileMenuOpen,
   setMobileMenuOpen,
@@ -229,6 +231,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
           </div>
+
+          {/* Auth Modal Trigger */}
+          <button
+            type="button"
+            onClick={onOpenAuth}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold transition-colors"
+          >
+            <User className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Login / Demo</span>
+          </button>
 
           {/* User Profile avatar */}
           <button

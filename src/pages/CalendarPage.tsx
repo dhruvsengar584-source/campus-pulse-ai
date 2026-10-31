@@ -5,11 +5,11 @@ import {
   ChevronRight, 
   Clock, 
   MapPin, 
-  Sparkles, 
-  CalendarPlus, 
+  Users,
   ExternalLink,
-  AlertTriangle,
-  Users
+  ShieldCheck,
+  CheckCircle2,
+  CalendarPlus
 } from 'lucide-react';
 import { Announcement } from '../types';
 
@@ -26,7 +26,7 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
   const [selectedDateStr, setSelectedDateStr] = useState<string>(
     new Date().toISOString().split('T')[0]
   );
-  const [viewMode, setViewMode] = useState<'month' | 'agenda'>('month');
+  const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('month');
 
   // Month details
   const year = currentDate.getFullYear();
@@ -76,6 +76,23 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
     return days;
   }, [year, month]);
 
+  // Compute days in current week (for Week view)
+  const daysInWeek = useMemo(() => {
+    const curr = new Date(selectedDateStr);
+    const first = curr.getDate() - curr.getDay();
+    const weekDays: { dateStr: string; dayName: string; dayNumber: number }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const next = new Date(curr);
+      next.setDate(first + i);
+      weekDays.push({
+        dateStr: next.toISOString().split('T')[0],
+        dayName: next.toLocaleDateString('en-US', { weekday: 'short' }),
+        dayNumber: next.getDate(),
+      });
+    }
+    return weekDays;
+  }, [selectedDateStr]);
+
   // Map events to date strings
   const eventsByDate = useMemo(() => {
     const map = new Map<string, Announcement[]>();
@@ -90,11 +107,25 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
   }, [announcements]);
 
   const handlePrevMonth = () => {
-    setCurrentDate(new Date(year, month - 1, 1));
+    if (viewMode === 'month') {
+      setCurrentDate(new Date(year, month - 1, 1));
+    } else {
+      const d = new Date(selectedDateStr);
+      d.setDate(d.getDate() - (viewMode === 'week' ? 7 : 1));
+      setSelectedDateStr(d.toISOString().split('T')[0]);
+      setCurrentDate(d);
+    }
   };
 
   const handleNextMonth = () => {
-    setCurrentDate(new Date(year, month + 1, 1));
+    if (viewMode === 'month') {
+      setCurrentDate(new Date(year, month + 1, 1));
+    } else {
+      const d = new Date(selectedDateStr);
+      d.setDate(d.getDate() + (viewMode === 'week' ? 7 : 1));
+      setSelectedDateStr(d.toISOString().split('T')[0]);
+      setCurrentDate(d);
+    }
   };
 
   const handleToday = () => {
@@ -140,8 +171,39 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Smart Campus Calendar</h1>
         </div>
 
-        {/* Month Navigation Controls */}
-        <div className="flex items-center gap-2">
+        {/* Month Navigation & View Mode Controls */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* View Mode Toggle: Month, Week, Day */}
+          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('month')}
+              className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                viewMode === 'month' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Month
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('week')}
+              className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                viewMode === 'week' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Week
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('day')}
+              className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                viewMode === 'day' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Day
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={handleToday}
@@ -149,6 +211,7 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
           >
             Today
           </button>
+
           <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
             <button
               type="button"
@@ -158,7 +221,7 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="px-3 text-xs font-bold text-white min-w-[130px] text-center">
-              {monthName}
+              {viewMode === 'month' ? monthName : selectedDateStr}
             </span>
             <button
               type="button"
@@ -176,85 +239,200 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
         
         {/* Calendar Grid (8 cols) */}
         <div className="lg:col-span-8 p-5 rounded-3xl glass-panel border border-slate-800">
-          {/* Day of Week Headers */}
-          <div className="grid grid-cols-7 gap-1 text-center mb-2">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-              <span key={d} className="text-xs font-bold text-slate-500 py-1 uppercase tracking-wider">
-                {d}
-              </span>
-            ))}
-          </div>
+          
+          {/* 1. MONTH VIEW */}
+          {viewMode === 'month' && (
+            <div>
+              {/* Day of Week Headers */}
+              <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                  <span key={d} className="text-xs font-bold text-slate-500 py-1 uppercase tracking-wider">
+                    {d}
+                  </span>
+                ))}
+              </div>
 
-          {/* Days Grid */}
-          <div className="grid grid-cols-7 gap-1.5">
-            {daysInMonth.map((day, idx) => {
-              const dayEvents = eventsByDate.get(day.dateStr) || [];
-              const isSelected = selectedDateStr === day.dateStr;
-              const isToday = day.dateStr === new Date().toISOString().split('T')[0];
+              {/* Days Grid */}
+              <div className="grid grid-cols-7 gap-1.5">
+                {daysInMonth.map((day, idx) => {
+                  const dayEvents = eventsByDate.get(day.dateStr) || [];
+                  const isSelected = selectedDateStr === day.dateStr;
+                  const isToday = day.dateStr === new Date().toISOString().split('T')[0];
 
-              return (
-                <div
-                  key={`${day.dateStr}-${idx}`}
-                  onClick={() => setSelectedDateStr(day.dateStr)}
-                  className={`min-h-[85px] sm:min-h-[100px] p-2 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
-                    isSelected
-                      ? 'bg-indigo-950/40 border-indigo-500/60 shadow-lg shadow-indigo-950'
-                      : day.isCurrentMonth
-                      ? 'bg-slate-900/60 hover:bg-slate-800/60 border-slate-800/80'
-                      : 'bg-slate-950/40 border-slate-900/50 text-slate-600 opacity-40'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs font-semibold rounded-full w-6 h-6 flex items-center justify-center ${
-                        isToday
-                          ? 'bg-indigo-600 text-white font-bold'
-                          : isSelected
-                          ? 'text-indigo-300 font-bold'
+                  return (
+                    <div
+                      key={`${day.dateStr}-${idx}`}
+                      onClick={() => setSelectedDateStr(day.dateStr)}
+                      className={`min-h-[85px] sm:min-h-[100px] p-2 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                        isSelected
+                          ? 'bg-indigo-950/40 border-indigo-500/60 shadow-lg shadow-indigo-950'
                           : day.isCurrentMonth
-                          ? 'text-slate-300'
-                          : 'text-slate-600'
+                          ? 'bg-slate-900/60 hover:bg-slate-800/60 border-slate-800/80'
+                          : 'bg-slate-950/40 border-slate-900/50 text-slate-600 opacity-40'
                       }`}
                     >
-                      {day.dayNumber}
-                    </span>
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`text-xs font-semibold rounded-full w-6 h-6 flex items-center justify-center ${
+                            isToday
+                              ? 'bg-indigo-600 text-white font-bold'
+                              : isSelected
+                              ? 'text-indigo-300 font-bold'
+                              : day.isCurrentMonth
+                              ? 'text-slate-300'
+                              : 'text-slate-600'
+                          }`}
+                        >
+                          {day.dayNumber}
+                        </span>
 
-                    {dayEvents.length > 0 && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300">
-                        {dayEvents.length}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Event Badges preview on day */}
-                  <div className="space-y-1 mt-1">
-                    {dayEvents.slice(0, 2).map((ev) => (
-                      <div
-                        key={ev.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectAnnouncement(ev);
-                        }}
-                        className="text-[10px] font-medium p-1 rounded bg-slate-800/90 hover:bg-indigo-900/60 text-slate-200 truncate border border-slate-700/60 flex items-center gap-1 transition-colors"
-                        title={ev.title}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${getCategoryColor(ev.category)}`} />
-                        <span className="truncate">{ev.title}</span>
+                        {dayEvents.length > 0 && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300">
+                            {dayEvents.length}
+                          </span>
+                        )}
                       </div>
-                    ))}
-                    {dayEvents.length > 2 && (
-                      <span className="text-[9px] text-slate-500 block text-right">
-                        +{dayEvents.length - 2} more
-                      </span>
-                    )}
+
+                      {/* Event Badges preview on day */}
+                      <div className="space-y-1 mt-1">
+                        {dayEvents.slice(0, 2).map((ev) => (
+                          <div
+                            key={ev.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectAnnouncement(ev);
+                            }}
+                            className="text-[10px] font-medium p-1 rounded bg-slate-800/90 hover:bg-indigo-900/60 text-slate-200 truncate border border-slate-700/60 flex items-center gap-1 transition-colors"
+                            title={ev.title}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${getCategoryColor(ev.category)}`} />
+                            <span className="truncate">{ev.title}</span>
+                          </div>
+                        ))}
+                        {dayEvents.length > 2 && (
+                          <span className="text-[9px] text-slate-500 block text-right">
+                            +{dayEvents.length - 2} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 2. WEEK VIEW */}
+          {viewMode === 'week' && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-7 gap-2 text-center pb-2 border-b border-slate-800">
+                {daysInWeek.map((d) => (
+                  <div
+                    key={d.dateStr}
+                    onClick={() => setSelectedDateStr(d.dateStr)}
+                    className={`p-2 rounded-xl cursor-pointer transition-all ${
+                      selectedDateStr === d.dateStr ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800/60 text-slate-400'
+                    }`}
+                  >
+                    <p className="text-[10px] uppercase font-bold">{d.dayName}</p>
+                    <p className="text-base font-extrabold">{d.dayNumber}</p>
                   </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                {daysInWeek.map((d) => {
+                  const evs = eventsByDate.get(d.dateStr) || [];
+                  return (
+                    <div key={d.dateStr} className="p-3 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-300">
+                        <span>{d.dayName}, {d.dateStr}</span>
+                        <span className="text-[10px] px-2 py-0.2 rounded-full bg-slate-800 text-slate-400">
+                          {evs.length} events
+                        </span>
+                      </div>
+                      <div className="space-y-1.5">
+                        {evs.map((ev) => (
+                          <div
+                            key={ev.id}
+                            onClick={() => onSelectAnnouncement(ev)}
+                            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer text-xs space-y-1"
+                          >
+                            <span className="text-[10px] font-bold text-indigo-300">{ev.category}</span>
+                            <p className="font-semibold text-white line-clamp-1">{ev.title}</p>
+                            <p className="text-[11px] text-slate-400">{ev.startTime} • {ev.venue}</p>
+                          </div>
+                        ))}
+                        {evs.length === 0 && (
+                          <p className="text-[11px] text-slate-500 py-2">No scheduled events</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 3. DAY VIEW */}
+          {viewMode === 'day' && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-indigo-950/30 border border-indigo-500/20 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">Day Agenda</span>
+                  <h3 className="text-lg font-bold text-white mt-0.5">
+                    {new Date(selectedDateStr).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </h3>
                 </div>
-              );
-            })}
-          </div>
+                <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 font-bold text-xs">
+                  {selectedDayEvents.length} Events Scheduled
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {selectedDayEvents.map((ev) => (
+                  <div
+                    key={ev.id}
+                    onClick={() => onSelectAnnouncement(ev)}
+                    className="p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300">
+                          {ev.category}
+                        </span>
+                        <span className="text-slate-400">{ev.startTime} - {ev.endTime}</span>
+                      </div>
+                      <h4 className="text-sm font-bold text-white hover:text-indigo-300">{ev.title}</h4>
+                      <p className="text-xs text-slate-400">{ev.venue} • {ev.organizer}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="px-4 py-2 rounded-xl bg-indigo-600/30 text-indigo-200 text-xs font-semibold shrink-0"
+                    >
+                      View Details & RSVP
+                    </button>
+                  </div>
+                ))}
+
+                {selectedDayEvents.length === 0 && (
+                  <div className="py-12 text-center text-slate-400">
+                    <p className="text-sm font-semibold">No events scheduled on this day.</p>
+                    <p className="text-xs text-slate-500 mt-1">Use the Month view to find dates with upcoming campus events.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Calendar Category Legend */}
-          <div className="mt-4 pt-4 border-t border-slate-800/80 flex items-center gap-3 flex-wrap text-xs text-slate-400">
+          <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center gap-3 flex-wrap text-xs text-slate-400">
             <span className="font-semibold text-slate-300">Category Legend:</span>
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-purple-500"></span> Hackathons</span>
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500"></span> Workshops</span>
@@ -284,7 +462,7 @@ export const CalendarPage: React.FC<CalendarPageProps> = ({
               </span>
             </div>
 
-            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
               {selectedDayEvents.map((ev) => (
                 <div
                   key={ev.id}

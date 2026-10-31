@@ -15,7 +15,8 @@ import {
   User, 
   Link as LinkIcon, 
   Info,
-  Check
+  Check,
+  Upload
 } from 'lucide-react';
 import { Announcement, AnnouncementCategory, ExtractedNotice, PriorityLevel, SourceType } from '../types';
 import { GeminiService } from '../services/geminiService';
@@ -72,6 +73,21 @@ export const AIParserPage: React.FC<AIParserPageProps> = ({
     setInputText(sample.rawText);
     setExtractedData(null);
     setIsPublished(false);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (text) {
+        setInputText(text);
+        setExtractedData(null);
+        setIsPublished(false);
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleStartExtraction = async () => {
@@ -219,7 +235,19 @@ export const AIParserPage: React.FC<AIParserPageProps> = ({
                   <FileText className="w-4 h-4 text-indigo-400" />
                   Paste Raw Notice / WhatsApp Text:
                 </label>
-                <span>{inputText.length} chars</span>
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-500/30 transition-colors">
+                    <Upload className="w-3 h-3" />
+                    <span>Upload File</span>
+                    <input
+                      type="file"
+                      accept=".txt,.md,.eml,.json"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <span>{inputText.length} chars</span>
+                </div>
               </div>
 
               <textarea

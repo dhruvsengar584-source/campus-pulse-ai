@@ -12,9 +12,13 @@ import {
   ExternalLink, 
   Filter, 
   X,
-  Sparkles
+  Sparkles,
+  Award,
+  BarChart3,
+  Check,
+  Ban
 } from 'lucide-react';
-import { Announcement, AnnouncementCategory, PriorityLevel, ReportItem, SourceType } from '../types';
+import { Announcement, AnnouncementCategory, PriorityLevel, ReportItem } from '../types';
 
 interface AdminPageProps {
   announcements: Announcement[];
@@ -39,6 +43,15 @@ const CATEGORIES: AnnouncementCategory[] = [
   'General Announcements',
 ];
 
+interface OrganizerChapter {
+  id: string;
+  name: string;
+  category: string;
+  department: string;
+  isVerified: boolean;
+  noticesPublished: number;
+}
+
 export const AdminPage: React.FC<AdminPageProps> = ({
   announcements,
   reports,
@@ -47,7 +60,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({
   onResolveReport,
   onCreateOfficialAnnouncement,
 }) => {
-  const [activeTab, setActiveTab] = useState<'queue' | 'all' | 'reports' | 'organizers'>('queue');
+  const [activeTab, setActiveTab] = useState<'queue' | 'all' | 'reports' | 'organizers' | 'analytics'>('queue');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Form state for creating official announcement
@@ -64,8 +77,27 @@ export const AdminPage: React.FC<AdminPageProps> = ({
   const [deadline, setDeadline] = useState('');
   const [priority, setPriority] = useState<PriorityLevel>('Important');
 
+  // Campus clubs state for Organizer Verification tab
+  const [organizers, setOrganizers] = useState<OrganizerChapter[]>([
+    { id: 'org-1', name: 'Google Developer Student Clubs (GDSC)', category: 'Technical Society', department: 'CS & IT', isVerified: true, noticesPublished: 12 },
+    { id: 'org-2', name: 'ACM Student Chapter', category: 'Computing Society', department: 'CS & Engineering', isVerified: true, noticesPublished: 8 },
+    { id: 'org-3', name: 'Training & Placement Cell (T&P)', category: 'Administrative Cell', department: 'University-wide', isVerified: true, noticesPublished: 24 },
+    { id: 'org-4', name: 'Student Cultural Council (SCC)', category: 'Cultural Council', department: 'Student Welfare', isVerified: true, noticesPublished: 15 },
+    { id: 'org-5', name: 'Robotics & Automation Society (RAS)', category: 'Technical Society', department: 'Mechanical & ECE', isVerified: true, noticesPublished: 6 },
+    { id: 'org-6', name: 'Campus Design Collective (CDC)', category: 'Design Club', department: 'Architecture & Design', isVerified: true, noticesPublished: 5 },
+    { id: 'org-7', name: 'Unofficial Campus Meme Forwarders', category: 'Informal Student Group', department: 'General', isVerified: false, noticesPublished: 2 },
+  ]);
+
+  const toggleOrganizerVerification = (id: string) => {
+    setOrganizers((prev) =>
+      prev.map((org) => (org.id === id ? { ...org, isVerified: !org.isVerified } : org))
+    );
+  };
+
   // Computed metrics
-  const pendingApprovals = announcements.filter((a) => a.verificationStatus === 'Community Submitted' || a.verificationStatus === 'Pending Review');
+  const pendingApprovals = announcements.filter(
+    (a) => a.verificationStatus === 'Community Submitted' || a.verificationStatus === 'Pending Review'
+  );
   const pendingReports = reports.filter((r) => r.status === 'Pending');
 
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -94,7 +126,6 @@ export const AdminPage: React.FC<AdminPageProps> = ({
     });
 
     setShowCreateModal(false);
-    // Reset form
     setTitle('');
     setDescription('');
   };
@@ -140,7 +171,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({
 
         <div className="p-5 rounded-2xl glass-panel border border-slate-800">
           <p className="text-xs font-semibold text-slate-400">Verified Organizers</p>
-          <p className="text-2xl font-extrabold text-cyan-400 font-mono mt-1">8 Chapters</p>
+          <p className="text-2xl font-extrabold text-cyan-400 font-mono mt-1">
+            {organizers.filter((o) => o.isVerified).length} Chapters
+          </p>
           <p className="text-[11px] text-slate-400 mt-1">GDSC, ACM, T&P, SCC</p>
         </div>
 
@@ -152,11 +185,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({
       </div>
 
       {/* Admin Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
         <button
           type="button"
           onClick={() => setActiveTab('queue')}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
             activeTab === 'queue'
               ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
               : 'text-slate-400 hover:text-slate-200'
@@ -173,7 +206,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('all')}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
             activeTab === 'all'
               ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40'
               : 'text-slate-400 hover:text-slate-200'
@@ -184,8 +217,21 @@ export const AdminPage: React.FC<AdminPageProps> = ({
 
         <button
           type="button"
+          onClick={() => setActiveTab('organizers')}
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'organizers'
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Award className="w-3.5 h-3.5" />
+          <span>Organizer Verification</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab('reports')}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
             activeTab === 'reports'
               ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
               : 'text-slate-400 hover:text-slate-200'
@@ -197,6 +243,19 @@ export const AdminPage: React.FC<AdminPageProps> = ({
               {pendingReports.length}
             </span>
           )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('analytics')}
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'analytics'
+              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <BarChart3 className="w-3.5 h-3.5" />
+          <span>Platform Analytics</span>
         </button>
       </div>
 
@@ -322,7 +381,62 @@ export const AdminPage: React.FC<AdminPageProps> = ({
         </div>
       )}
 
-      {/* Tab 3: Reported Inaccuracies Queue */}
+      {/* Tab 3: Organizer Verification Management */}
+      {activeTab === 'organizers' && (
+        <div className="space-y-4">
+          <div className="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 text-xs text-cyan-300 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-cyan-400" />
+              <span>
+                <strong>Trust Layer:</strong> Verified organizers receive a blue shield badge and can publish without manual moderation queue.
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {organizers.map((org) => (
+              <div
+                key={org.id}
+                className="p-5 rounded-2xl glass-panel border border-slate-800 flex items-center justify-between gap-4"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-white">{org.name}</h3>
+                    {org.isVerified && (
+                      <span title="Verified" className="shrink-0">
+                        <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400">{org.category} • {org.department}</p>
+                  <p className="text-[11px] text-slate-500">{org.noticesPublished} announcements published</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => toggleOrganizerVerification(org.id)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                    org.isVerified
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-400'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:bg-emerald-600/20'
+                  }`}
+                >
+                  {org.isVerified ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Verified</span>
+                    </>
+                  ) : (
+                    <span>Verify Chapter</span>
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tab 4: Reported Inaccuracies Queue */}
       {activeTab === 'reports' && (
         <div className="space-y-4">
           {reports.length > 0 ? (
@@ -372,6 +486,76 @@ export const AdminPage: React.FC<AdminPageProps> = ({
               <p className="text-xs text-slate-400">All campus announcements have verified data accuracy.</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Tab 5: Platform Analytics & Distribution */}
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="p-5 rounded-2xl glass-panel border border-slate-800 space-y-2">
+              <p className="text-xs text-slate-400">Total Student RSVPs</p>
+              <p className="text-2xl font-extrabold text-white font-mono">1,420</p>
+              <p className="text-[11px] text-emerald-400">+28% growth this semester</p>
+            </div>
+
+            <div className="p-5 rounded-2xl glass-panel border border-slate-800 space-y-2">
+              <p className="text-xs text-slate-400">Average Notice Parsing Time</p>
+              <p className="text-2xl font-extrabold text-cyan-400 font-mono">0.82s</p>
+              <p className="text-[11px] text-slate-400">Powered by Gemini 2.5 Flash</p>
+            </div>
+
+            <div className="p-5 rounded-2xl glass-panel border border-slate-800 space-y-2">
+              <p className="text-xs text-slate-400">Information Accuracy Score</p>
+              <p className="text-2xl font-extrabold text-indigo-400 font-mono">99.4%</p>
+              <p className="text-[11px] text-emerald-400">Based on verified sources</p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-3xl glass-panel border border-slate-800 space-y-4">
+            <h3 className="text-sm font-bold text-white">Announcement Ingestion Channels</h3>
+            <div className="space-y-3 text-xs">
+              <div>
+                <div className="flex justify-between text-slate-300 mb-1">
+                  <span>WhatsApp Student Channels & Forwards</span>
+                  <span className="font-mono text-emerald-400">42% (68 notices)</span>
+                </div>
+                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div className="bg-emerald-500 h-full rounded-full" style={{ width: '42%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-slate-300 mb-1">
+                  <span>Official University Portal Circulars</span>
+                  <span className="font-mono text-indigo-400">31% (50 notices)</span>
+                </div>
+                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '31%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-slate-300 mb-1">
+                  <span>Department Faculty Broadcasts</span>
+                  <span className="font-mono text-cyan-400">18% (29 notices)</span>
+                </div>
+                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div className="bg-cyan-500 h-full rounded-full" style={{ width: '18%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-slate-300 mb-1">
+                  <span>Club Posters & Social Media Captions</span>
+                  <span className="font-mono text-pink-400">9% (15 notices)</span>
+                </div>
+                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div className="bg-pink-500 h-full rounded-full" style={{ width: '9%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
